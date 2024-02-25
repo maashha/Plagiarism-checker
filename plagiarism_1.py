@@ -9,14 +9,10 @@ import zipfile
 np.random.seed(0)
 sns.set_theme()
 tokens_list = []
-filename = 'Архив_2.zip'
+filename = 'DIR.zip'
 with zipfile.ZipFile(filename) as zip:
     namelist = zip.namelist()
 number_files = len(namelist)
-# проводим токенизацию кода
-# для каждого слова кода определяем является он строкой, числом и т.д.
-# каждый отдельный тип слов обозначаем своим символом 
-# после анализа всего кода получаем строку, состоящую из этим символов
 for files in range(0, number_files, 2):
     with zipfile.ZipFile('Архив_2.zip') as thezip:
         with tokenize.open(namelist[files]) as f:
@@ -44,7 +40,6 @@ for files in range(0, number_files, 2):
             tokens_list.append(finalToken)
 
 
-# сравниваем каждые две строки по алгоритму Фишера
 def fisher(word1, word2):
     comparison = [0] * (len(word2)+1)
     for element in range(len(word2)+1):
@@ -67,7 +62,7 @@ def fisher(word1, word2):
                                                comparison[line-1][column-1]+1)
     return (1-(comparison[len(word2)][len(word1)]/max(len(word1),
                len(word2))))*100
-# создаем массив, в котором будут находиться итоговые значения попарных сранений
+
 resoults = []
 lines = []
 for number_name in range(number_files//2):
@@ -77,19 +72,18 @@ for number_name in range(number_files//2):
     for name_number in range(number_files//2):
         lines.append(100)
 resoults.append(lines)
-# выводим результаты для каждых двух сравнимаемых программ
+
 for first_file in range(number_files//2):
     for second_file in range(first_file+1, number_files//2):
         if fisher(tokens_list[first_file], tokens_list[second_file]):
             print(namelist[first_file*2], namelist[second_file*2],
                   fisher(tokens_list[first_file], tokens_list[second_file]))
-        # добавляем значения процента схожести в массивы с результатами
+       
         resoults[first_file][second_file] = fisher(tokens_list[first_file],
                                                    tokens_list[second_file])
         resoults[second_file][first_file] = fisher(tokens_list[first_file],
                                                    tokens_list[second_file])
-# делаем из массива с результатами DataFrame
-# по его данным строим heatmap
+
 DataFrame_resoults = pd.DataFrame(resoults)
 sns.heatmap(DataFrame_resoults, cmap="ocean",  vmin=0, vmax=100)
 plt.show()
